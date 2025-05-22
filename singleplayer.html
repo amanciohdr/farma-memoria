@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória - Formas Farmacêuticas</title>
+    <!-- Fonte importada -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka One', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 5px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 22px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        .start-btn {
+            background-color: #27ae60;
+        }
+        
+        .start-btn:hover {
+            background-color: #219653;
+        }
+        
+        .score {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .start-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .countdown-small {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e74c3c;
+            display: none;
+        }
+        
+        .restart-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 10px;
+        }
+        
+        .memory-card {
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+        }
+        
+        .memory-card.flip {
+            transform: rotateY(180deg);
+        }
+        
+        .front-face, .back-face {
+            width: 100%;
+            height: 100%;
+            padding: 5px;
+            position: absolute;
+            border-radius: 5px;
+            background: white;
+            backface-visibility: hidden;
+            border: 2px solid #3498db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        .front-face {
+            transform: rotateY(180deg);
+        }
+        
+        .back-face {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .card-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .success-message {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+            font-size: 16px;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #95a5a6;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #7f8c8d;
+        }
+
+
+        
+        @media (max-width: 800px) {
+            .memory-game {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+            .memory-card {
+                height: 70px;
+            }
+            .front-face, .back-face {
+                font-size: 10px;
+                padding: 3px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .memory-game {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .memory-card {
+                height: 60px;
+            }
+            h1 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">←</a>
+    <h1>Jogo da Memória - Formas Farmacêuticas</h1>
+    
+    <div class="game-info">
+        <div class="start-container">
+            <button class="button start-btn">Iniciar Jogo</button>
+            <div class="countdown-small">5s</div>
+        </div>
+        <div class="score">Tentativas: <span id="moves">0</span></div>
+    </div>
+    
+    <div class="memory-game"></div>
+    
+    <div class="restart-container">
+        <button class="button restart-btn">Reiniciar Jogo</button>
+    </div>
+    
+    <div class="success-message">Parabéns! Você completou o jogo!</div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Definição das cartas com caminho para as imagens
+            const cards = [
+                {
+                    name: 'spray',
+                    imagePath: 'images/spray.png',
+                    text: 'SPRAY'
+                },
+                {
+                    name: 'adesivo',
+                    imagePath: 'images/adesivo.png',
+                    text: 'ADESIVO'
+                },
+                {
+                    name: 'ampola',
+                    imagePath: 'images/ampola.png',
+                    text: 'AMPOLA'
+                },
+                {
+                    name: 'capsula',
+                    imagePath: 'images/capsula.png',
+                    text: 'CÁPSULA'
+                },
+                {
+                    name: 'colirio',
+                    imagePath: 'images/colirio.png',
+                    text: 'COLÍRIO'
+                },
+                {
+                    name: 'frascoampola',
+                    imagePath: 'images/frascoampola.png',
+                    text: 'FRASCO-AMPOLA'
+                },
+                {
+                    name: 'comprimido',
+                    imagePath: 'images/comprimido.png',
+                    text: 'COMPRIMIDO'
+                },
+                {
+                    name: 'gel',
+                    imagePath: 'images/gel.png',
+                    text: 'GEL'
+                },
+                {
+                    name: 'inalador',
+                    imagePath: 'images/inalador.png',
+                    text: 'INALADOR'
+                },
+                {
+                    name: 'po',
+                    imagePath: 'images/po.png',
+                    text: 'PÓ'
+                },
+                {
+                    name: 'pomada',
+                    imagePath: 'images/pomada.png',
+                    text: 'POMADA'
+                },
+                {
+                    name: 'spraynasal',
+                    imagePath: 'images/spraynasal.png',
+                    text: 'SPRAY NASAL'
+                },
+                {
+                    name: 'supositorio',
+                    imagePath: 'images/supositorio.png',
+                    text: 'SUPOSITÓRIO'
+                },
+                {
+                    name: 'comprimidoefervescente',
+                    imagePath: 'images/comprimidoefervescente.png',
+                    text: 'COMPRIMIDO EFERVESCENTE'
+                },
+                {
+                    name: 'xarope',
+                    imagePath: 'images/xarope.png',
+                    text: 'XAROPE'
+                },
+                {
+                    name: 'GOMA',
+                    imagePath: 'images/goma.png',
+                    text: 'GOMA'
+                }
+            ];
+            
+            // Double the cards (one for image, one for text)
+            const gameCards = [];
+            cards.forEach(card => {
+                gameCards.push({
+                    name: card.name,
+                    content: `<img src="${card.imagePath}" alt="${card.text}" class="card-image">`,
+                    type: 'image'
+                });
+                gameCards.push({
+                    name: card.name,
+                    content: card.text,
+                    type: 'text'
+                });
+            });
+            
+            let moves = 0;
+            let hasFlippedCard = false;
+            let lockBoard = false;
+            let firstCard, secondCard;
+            let matchedPairs = 0;
+            const totalPairs = cards.length;
+            let gameStarted = false;
+            
+            const gameContainer = document.querySelector('.memory-game');
+            const movesCounter = document.getElementById('moves');
+            const restartButton = document.querySelector('.restart-btn');
+            const startButton = document.querySelector('.start-btn');
+            const successMessage = document.querySelector('.success-message');
+            
+            // Initialize the game
+            function initGame() {
+                // Reset game state
+                moves = 0;
+                hasFlippedCard = false;
+                lockBoard = false;
+                firstCard = null;
+                secondCard = null;
+                matchedPairs = 0;
+                gameStarted = false;
+                movesCounter.textContent = moves;
+                successMessage.style.display = 'none';
+                
+                // Clear the game container
+                gameContainer.innerHTML = '';
+                
+                // Shuffle cards
+                const shuffledCards = [...gameCards].sort(() => Math.random() - 0.5);
+                
+                // Create card elements
+                shuffledCards.forEach((cardData, index) => {
+                    const card = document.createElement('div');
+                    card.classList.add('memory-card');
+                    card.dataset.name = cardData.name;
+                    card.dataset.type = cardData.type;
+                    
+                    const frontFace = document.createElement('div');
+                    frontFace.classList.add('front-face');
+                    frontFace.innerHTML = cardData.content;
+                    
+                    const backFace = document.createElement('div');
+                    backFace.classList.add('back-face');
+                    backFace.textContent = '?';
+                    
+                    card.appendChild(frontFace);
+                    card.appendChild(backFace);
+                    
+                    gameContainer.appendChild(card);
+                });
+
+                // Reativando botão de iniciar
+                startButton.disabled = false;
+                startButton.textContent = 'Iniciar Jogo';
+            }
+            
+            function flipCard() {
+                if (lockBoard) return;
+                if (!gameStarted) return;
+                if (this === firstCard) return;
+                
+                this.classList.add('flip');
+                
+                if (!hasFlippedCard) {
+                    // First card flipped
+                    hasFlippedCard = true;
+                    firstCard = this;
+                    return;
+                }
+                
+                // Second card flipped
+                secondCard = this;
+                checkForMatch();
+            }
+            
+            function checkForMatch() {
+                moves++;
+                movesCounter.textContent = moves;
+                
+                let isMatch = false;
+                
+                // Check if the cards match (same name but different types)
+                if (firstCard.dataset.name === secondCard.dataset.name &&
+                    firstCard.dataset.type !== secondCard.dataset.type) {
+                    isMatch = true;
+                }
+                
+                isMatch ? disableCards() : unflipCards();
+            }
+            
+            function disableCards() {
+                firstCard.removeEventListener('click', flipCard);
+                secondCard.removeEventListener('click', flipCard);
+                
+                matchedPairs++;
+                
+                // Check if game is completed
+                if (matchedPairs === totalPairs) {
+                    setTimeout(() => {
+                        successMessage.style.display = 'block';
+                    }, 500);
+                }
+                
+                resetBoard();
+            }
+            
+            function unflipCards() {
+                lockBoard = true;
+                
+                setTimeout(() => {
+                    firstCard.classList.remove('flip');
+                    secondCard.classList.remove('flip');
+                    
+                    resetBoard();
+                }, 1000);
+            }
+            
+            function resetBoard() {
+                [hasFlippedCard, lockBoard] = [false, false];
+                [firstCard, secondCard] = [null, null];
+            }
+
+            function startGame() {
+                if (gameStarted) return;
+                
+                // Desativa o botão de iniciar durante o jogo
+                startButton.disabled = true;
+                startButton.textContent = 'Jogo em andamento';
+                
+                // Vira todas as cartas para cima
+                const allCards = document.querySelectorAll('.memory-card');
+                allCards.forEach(card => {
+                    card.classList.add('flip');
+                });
+                
+                // Mostra contagem regressiva
+                const countdownElement = document.querySelector('.countdown-small');
+                countdownElement.style.display = 'block';
+                let timeLeft = 5;
+                countdownElement.textContent = timeLeft + 's';
+                
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    countdownElement.textContent = timeLeft + 's';
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        countdownElement.style.display = 'none';
+                        
+                        // Desvira todas as cartas
+                        allCards.forEach(card => {
+                            card.classList.remove('flip');
+                            // Adiciona evento de clique apenas após o tempo de memorização
+                            card.addEventListener('click', flipCard);
+                        });
+                        
+                        // Inicia o jogo
+                        gameStarted = true;
+                    }
+                }, 1000);
+            }
+            
+            // Event listener for restart button
+            restartButton.addEventListener('click', initGame);
+            
+            // Event listener for start button
+            startButton.addEventListener('click', startGame);
+            
+            // Initialize the game on load
+            initGame();
+        });
+    </script>
+</body>
+</html>

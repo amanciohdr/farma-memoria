@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Encaixe das Formas Farmacêuticas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka One', Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    #shadow-board, #pieces {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      max-width: 1000px;
+      margin-bottom: 30px;
+    }
+
+    .shadow-slot {
+      position: relative;
+      width: 110px;
+      height: 130px;
+      border: 2px dashed #bbb;
+      background-color: #ecf0f1;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s;
+    }
+
+    .shadow-slot:hover {
+      background-color: #dfe6e9;
+    }
+
+    .shadow-slot .shadow {
+      position: absolute;
+      top: 15px;
+      width: 70px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .shadow-label {
+      margin-top: auto;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #2c3e50;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .piece {
+  width: 80px;
+  height: 80px;
+  cursor: grab;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+    .piece img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+    .piece img {
+      width: 90%;
+      object-fit: contain;
+    }
+
+    .dropped {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      cursor: default;
+    }
+
+    .toggle-button {
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      font-size: 14px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #95a5a6;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #7f8c8d;
+        }
+
+    .toggle-button:hover {
+     background-color: #2980b9;
+}
+
+    @media (max-width: 600px) {
+      .shadow-slot {
+        width: 90px;
+        height: 110px;
+      }
+
+      .piece {
+        width: 70px;
+        height: 70px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .shadow-label {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-button">←</a>
+  <h1>Arraste a Forma para sua Sombra</h1>
+  <button id="toggle-shadows" class="toggle-button">Ocultar Sombras</button>
+
+  <div id="shadow-board">
+  <div class="shadow-slot" data-name="spray">
+    <img class="shadow" src="images/sombra_spray.png" alt="">
+    <div class="shadow-label">SPRAY</div>
+  </div>
+  <div class="shadow-slot" data-name="adesivo">
+    <img class="shadow" src="images/sombra_adesivo.png" alt="">
+    <div class="shadow-label">ADESIVO</div>
+  </div>
+  <div class="shadow-slot" data-name="ampola">
+    <img class="shadow" src="images/sombra_ampola.png" alt="">
+    <div class="shadow-label">AMPOLA</div>
+  </div>
+  <div class="shadow-slot" data-name="capsula">
+    <img class="shadow" src="images/sombra_capsula.png" alt="">
+    <div class="shadow-label">CÁPSULA</div>
+  </div>
+  <div class="shadow-slot" data-name="colirio">
+    <img class="shadow" src="images/sombra_colirio.png" alt="">
+    <div class="shadow-label">COLÍRIO</div>
+  </div>
+  <div class="shadow-slot" data-name="frascoampola">
+    <img class="shadow" src="images/sombra_frascoampola.png" alt="">
+    <div class="shadow-label">FRASCO-AMPOLA</div>
+  </div>
+  <div class="shadow-slot" data-name="comprimido">
+    <img class="shadow" src="images/sombra_comprimido.png" alt="">
+    <div class="shadow-label">COMPRIMIDO</div>
+  </div>
+  <div class="shadow-slot" data-name="gel">
+    <img class="shadow" src="images/sombra_gel.png" alt="">
+    <div class="shadow-label">GEL</div>
+  </div>
+  <div class="shadow-slot" data-name="inalador">
+    <img class="shadow" src="images/sombra_inalador.png" alt="">
+    <div class="shadow-label">INALADOR</div>
+  </div>
+  <div class="shadow-slot" data-name="po">
+    <img class="shadow" src="images/sombra_po.png" alt="">
+    <div class="shadow-label">PÓ</div>
+  </div>
+  <div class="shadow-slot" data-name="pomada">
+    <img class="shadow" src="images/sombra_pomada.png" alt="">
+    <div class="shadow-label">POMADA</div>
+  </div>
+  <div class="shadow-slot" data-name="spraynasal">
+    <img class="shadow" src="images/sombra_spraynasal.png" alt="">
+    <div class="shadow-label">SPRAY NASAL</div>
+  </div>
+  <div class="shadow-slot" data-name="supositorio">
+    <img class="shadow" src="images/sombra_supositorio.png" alt="">
+    <div class="shadow-label">SUPOSITÓRIO</div>
+  </div>
+  <div class="shadow-slot" data-name="comprimidoefervescente">
+    <img class="shadow" src="images/sombra_comprimidoefervescente.png" alt="">
+    <div class="shadow-label">COMPRIMIDO EFERVESCENTE</div>
+  </div>
+  <div class="shadow-slot" data-name="xarope">
+    <img class="shadow" src="images/sombra_xarope.png" alt="">
+    <div class="shadow-label">XAROPE</div>
+  </div>
+  <div class="shadow-slot" data-name="GOMA">
+    <img class="shadow" src="images/sombra_GOMA.png" alt="">
+    <div class="shadow-label">GOMA</div>
+  </div>
+</div>
+
+<div id="pieces">
+  <div class="piece" draggable="true" data-name="spray">
+    <img src="images/spray.png" alt="spray">
+  </div>
+  <div class="piece" draggable="true" data-name="adesivo">
+    <img src="images/adesivo.png" alt="adesivo">
+  </div>
+  <div class="piece" draggable="true" data-name="ampola">
+    <img src="images/ampola.png" alt="ampola">
+  </div>
+  <div class="piece" draggable="true" data-name="capsula">
+    <img src="images/capsula.png" alt="capsula">
+  </div>
+  <div class="piece" draggable="true" data-name="colirio">
+    <img src="images/colirio.png" alt="colirio">
+  </div>
+  <div class="piece" draggable="true" data-name="frascoampola">
+    <img src="images/frascoampola.png" alt="frascoampola">
+  </div>
+  <div class="piece" draggable="true" data-name="comprimido">
+    <img src="images/comprimido.png" alt="comprimido">
+  </div>
+  <div class="piece" draggable="true" data-name="gel">
+    <img src="images/gel.png" alt="gel">
+  </div>
+  <div class="piece" draggable="true" data-name="inalador">
+    <img src="images/inalador.png" alt="inalador">
+  </div>
+  <div class="piece" draggable="true" data-name="po">
+    <img src="images/po.png" alt="po">
+  </div>
+  <div class="piece" draggable="true" data-name="pomada">
+    <img src="images/pomada.png" alt="pomada">
+  </div>
+  <div class="piece" draggable="true" data-name="spraynasal">
+    <img src="images/spraynasal.png" alt="spraynasal">
+  </div>
+  <div class="piece" draggable="true" data-name="supositorio">
+    <img src="images/supositorio.png" alt="supositorio">
+  </div>
+  <div class="piece" draggable="true" data-name="comprimidoefervescente">
+    <img src="images/comprimidoefervescente.png" alt="comprimidoefervescente">
+  </div>
+  <div class="piece" draggable="true" data-name="xarope">
+    <img src="images/xarope.png" alt="xarope">
+  </div>
+  <div class="piece" draggable="true" data-name="GOMA">
+    <img src="images/GOMA.png" alt="GOMA">
+  </div>
+</div>
+
+
+  <script>
+    let dragged = null;
+
+    document.querySelectorAll('.piece').forEach(piece => {
+      piece.addEventListener('dragstart', e => {
+        dragged = piece;
+      });
+    });
+
+    document.querySelectorAll('.shadow-slot').forEach(slot => {
+      slot.addEventListener('dragover', e => e.preventDefault());
+      slot.addEventListener('drop', () => {
+        if (!dragged) return;
+        
+        const slotName = slot.dataset.name;
+        const pieceName = dragged.dataset.name;
+
+        if (slotName === pieceName && !slot.querySelector('.piece')) {
+          const clone = dragged.cloneNode(true);
+          clone.classList.add("dropped");
+          clone.setAttribute("draggable", false);
+          slot.appendChild(clone);
+          dragged.remove();
+          dragged = null;
+        }
+      });
+        const toggleButton = document.getElementById('toggle-shadows');
+    let shadowsVisible = true;
+
+    toggleButton.addEventListener('click', () => {
+      document.querySelectorAll('.shadow').forEach(shadow => {
+        shadow.style.display = shadowsVisible ? 'none' : 'block';
+      });
+
+      toggleButton.textContent = shadowsVisible ? 'Mostrar Sombras' : 'Ocultar Sombras';
+      shadowsVisible = !shadowsVisible;
+});
+    });
+  </script>
+</body>
+</html>
