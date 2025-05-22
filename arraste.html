@@ -281,44 +281,50 @@
 </div>
 
 
-  <script>
-    let dragged = null;
+<script>
+  let dragged = null;
 
-    document.querySelectorAll('.piece').forEach(piece => {
-      piece.addEventListener('dragstart', e => {
-        dragged = piece;
-      });
+  // Evento de arrastar começa
+  document.querySelectorAll('.piece').forEach(piece => {
+    piece.addEventListener('dragstart', e => {
+      dragged = piece;
+    });
+  });
+
+  // Receber peça nas sombras
+  document.querySelectorAll('.shadow-slot').forEach(slot => {
+    slot.addEventListener('dragover', e => e.preventDefault());
+
+    slot.addEventListener('drop', () => {
+      if (!dragged) return;
+
+      const slotName = slot.dataset.name;
+      const pieceName = dragged.dataset.name;
+
+      if (slotName === pieceName && !slot.querySelector('.piece')) {
+        const clone = dragged.cloneNode(true);
+        clone.classList.add("dropped");
+        clone.setAttribute("draggable", false);
+        slot.appendChild(clone);
+        dragged.remove();
+        dragged = null;
+      }
+    });
+  });
+
+  // Alternar exibição das sombras
+  const toggleButton = document.getElementById('toggle-shadows');
+  let shadowsVisible = true;
+
+  toggleButton.addEventListener('click', () => {
+    document.querySelectorAll('.shadow').forEach(shadow => {
+      shadow.style.display = shadowsVisible ? 'none' : 'block';
     });
 
-    document.querySelectorAll('.shadow-slot').forEach(slot => {
-      slot.addEventListener('dragover', e => e.preventDefault());
-      slot.addEventListener('drop', () => {
-        if (!dragged) return;
-        
-        const slotName = slot.dataset.name;
-        const pieceName = dragged.dataset.name;
+    toggleButton.textContent = shadowsVisible ? 'Mostrar Sombras' : 'Ocultar Sombras';
+    shadowsVisible = !shadowsVisible;
+  });
+</script>
 
-        if (slotName === pieceName && !slot.querySelector('.piece')) {
-          const clone = dragged.cloneNode(true);
-          clone.classList.add("dropped");
-          clone.setAttribute("draggable", false);
-          slot.appendChild(clone);
-          dragged.remove();
-          dragged = null;
-        }
-      });
-        const toggleButton = document.getElementById('toggle-shadows');
-    let shadowsVisible = true;
-
-    toggleButton.addEventListener('click', () => {
-      document.querySelectorAll('.shadow').forEach(shadow => {
-        shadow.style.display = shadowsVisible ? 'none' : 'block';
-      });
-
-      toggleButton.textContent = shadowsVisible ? 'Mostrar Sombras' : 'Ocultar Sombras';
-      shadowsVisible = !shadowsVisible;
-});
-    });
-  </script>
 </body>
 </html>
